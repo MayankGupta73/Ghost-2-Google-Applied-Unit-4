@@ -51,7 +51,8 @@ public class GhostActivity extends AppCompatActivity {
 
         btnChallenge = (Button) findViewById(R.id.btnChallenge);
         btnReset = (Button) findViewById(R.id.btnReset);
-        tvUserScore
+        tvUserScore = (TextView) findViewById(R.id.tvUserScore);
+        tvCompScore = (TextView) findViewById(R.id.tvCompScore);
 
         AssetManager assetManager = getAssets();
         try {
@@ -68,17 +69,23 @@ public class GhostActivity extends AppCompatActivity {
                 if(word.length()>=4 && simpleDictionary.isWord(word)){
                     label.setText("User Wins");
                     btnChallenge.setEnabled(false);
+                    userScore++;
+                    updateScore();
                 }
                 else {
                     String correctWord = simpleDictionary.getAnyWordStartingWith(word);
                     if(correctWord == null){
                         label.setText("User Wins");
                         btnChallenge.setEnabled(false);
+                        userScore++;
+                        updateScore();
                     }
                     else {
                         text.setText(correctWord);
                         label.setText("Computer Wins. A word can be made");
                         btnChallenge.setEnabled(false);
+                        compScore++;
+                        updateScore();
                     }
                 }
             }
@@ -146,6 +153,8 @@ public class GhostActivity extends AppCompatActivity {
         userTurn = false;
         if(simpleDictionary.isWord(word) && (word.length()>=4)){
             label.setText("Computer Wins. This is a word already");
+            compScore++;
+            updateScore();
             return;
         }
         else{
@@ -153,6 +162,8 @@ public class GhostActivity extends AppCompatActivity {
             if(correctWord == null){
                 label.setText("Computer Wins. No word can be formed!");
                 btnChallenge.setEnabled(false);
+                compScore++;
+                updateScore();
                 return;
             }
             else {
@@ -188,6 +199,7 @@ public class GhostActivity extends AppCompatActivity {
     }
 
     void updateScore(){
-
+        tvUserScore.setText("User Score: "+userScore);
+        tvUserScore.setText("Computer Score: "+compScore);
     }
 }
