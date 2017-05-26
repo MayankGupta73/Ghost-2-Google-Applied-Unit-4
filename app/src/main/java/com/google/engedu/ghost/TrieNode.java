@@ -15,7 +15,10 @@
 
 package com.google.engedu.ghost;
 
+import android.util.Log;
+
 import java.util.HashMap;
+import java.util.Random;
 
 
 public class TrieNode {
@@ -28,14 +31,59 @@ public class TrieNode {
     }
 
     public void add(String s) {
+        TrieNode temp, curr = this;
+        for(char ch: s.toCharArray()) {
+            if (curr.children.containsKey(String.valueOf(ch))) {
+                curr = curr.children.get(String.valueOf(ch));
+            } else {
+                temp = new TrieNode();
+                curr.children.put(String.valueOf(ch), temp);
+                curr = temp;
+            }
+        }
+
+        curr.isWord = true;
     }
 
     public boolean isWord(String s) {
-      return false;
+        TrieNode curr = this;
+        for(char ch: s.toCharArray()){
+            if(!curr.children.containsKey(String.valueOf(ch)))
+                return false;
+            curr = curr.children.get(String.valueOf(ch));
+        }
+        if(curr.isWord)
+            return true;
+        else
+            return false;
     }
 
     public String getAnyWordStartingWith(String s) {
-        return null;
+        StringBuilder stringBuilder = new StringBuilder();
+        Random random = new Random();
+        TrieNode curr = this;
+        for(char ch: s.toCharArray()){
+            if(!curr.children.containsKey(String.valueOf(ch)))
+                return null;
+            curr = curr.children.get(String.valueOf(ch));
+        }
+        stringBuilder.append(s);
+        while(!curr.isWord){
+           if(curr.children.isEmpty() && !curr.isWord)
+               return null;
+            int length =  curr.children.keySet().toArray().length;
+            int rand = Math.abs(random.nextInt()%(length));
+            Log.d("ghost", "getAnyWordStartingWith: rand "+rand+ " length "+ length);
+            String randomKey = (String) curr.children.keySet().toArray()[rand];
+            stringBuilder.append(randomKey);
+            curr = curr.children.get(randomKey);
+        }
+
+        return  stringBuilder.toString();
+//        if(curr.isWord)
+//            return stringBuilder.toString();
+//        else
+//            return null;
     }
 
     public String getGoodWordStartingWith(String s) {

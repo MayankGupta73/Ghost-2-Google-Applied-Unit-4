@@ -44,6 +44,7 @@ public class GhostActivity extends AppCompatActivity {
     Button btnChallenge ,btnReset;
     TextView text,label,tvUserScore,tvCompScore;
     SimpleDictionary simpleDictionary;
+    FastDictionary fastDictionary;
 
     public static final String TAG = "ghost";
 
@@ -59,7 +60,8 @@ public class GhostActivity extends AppCompatActivity {
 
         AssetManager assetManager = getAssets();
         try {
-             simpleDictionary = new SimpleDictionary(assetManager.open("words.txt"));
+//             simpleDictionary = new SimpleDictionary(assetManager.open("words.txt"));
+            fastDictionary = new FastDictionary(assetManager.open("words.txt"));
             onStart(null);
 
         } catch (IOException e) {
@@ -71,14 +73,14 @@ public class GhostActivity extends AppCompatActivity {
                 if(!userTurn)
                     return;
                 String word = text.getText().toString().trim();
-                if(word.length()>=4 && simpleDictionary.isWord(word)){
+                if(word.length()>=4 && fastDictionary.isWord(word)){
                     label.setText("User Wins. This is already a word.");
                     btnChallenge.setEnabled(false);
                     userScore++;
                     updateScore();
                 }
                 else {
-                    String correctWord = simpleDictionary.getAnyWordStartingWith(word);
+                    String correctWord = fastDictionary.getAnyWordStartingWith(word);
                     if(correctWord == null){
                         label.setText("User Wins. No word can be made.");
                         btnChallenge.setEnabled(false);
@@ -165,7 +167,7 @@ public class GhostActivity extends AppCompatActivity {
         btnChallenge.setEnabled(false);
         btnReset.setEnabled(false);
         userTurn = false;
-        if(simpleDictionary.isWord(word) && (word.length()>=4)){
+        if(fastDictionary.isWord(word) && (word.length()>=4)){
             label.setText("Computer Wins. This is a word already");
             compScore++;
             updateScore();
@@ -174,7 +176,7 @@ public class GhostActivity extends AppCompatActivity {
         }
         else{
             String correctWord;
-            correctWord = simpleDictionary.getAnyWordStartingWith(word);
+            correctWord = fastDictionary.getAnyWordStartingWith(word);
             Log.d(TAG, "computerTurn: word "+word);
             Log.d(TAG, "computerTurn: correctWord "+correctWord);
             if(correctWord == null){
@@ -221,6 +223,6 @@ public class GhostActivity extends AppCompatActivity {
 
     void updateScore(){
         tvUserScore.setText("User Score: "+userScore);
-        tvUserScore.setText("Computer Score: "+compScore);
+        tvCompScore.setText("Computer Score: "+compScore);
     }
 }
