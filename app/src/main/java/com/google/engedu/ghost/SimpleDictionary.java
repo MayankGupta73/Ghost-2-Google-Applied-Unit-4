@@ -15,11 +15,16 @@
 
 package com.google.engedu.ghost;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Random;
 
 public class SimpleDictionary implements GhostDictionary {
@@ -44,26 +49,27 @@ public class SimpleDictionary implements GhostDictionary {
 
     @Override
     public String getAnyWordStartingWith(String prefix) {
+        Log.d("ghost", "getAnyWordStartingWith: word "+prefix);
         if(prefix.isEmpty()){
             Random random = new Random();
-            int n = random.nextInt()%words.size();
+            int n = random.nextInt()%60000;
+            Log.d("ghost", "getAnyWordStartingWith: is empty");
             return words.get(n);
         }
         else {
-            int N = 10000;
-            int l = 0, r = N - 1, mid = (l + r) / 2;
+            int N = words.size();
+            int l = 0, r = N - 1, mid;
             while (l <= r) {
-                if (words.get(mid).startsWith(prefix) && words.get(mid).length()>=4) {
+                mid = (l + r)/2;
+                String word = words.get(mid);
+                if (word.startsWith(prefix)) {
                     return words.get(mid);
-                } else if (prefix.compareTo(words.get(mid)) > 0) {
+                } else if (prefix.compareTo(word) > 0) {
                     l = mid + 1;
                 } else
                     r = mid - 1;
-
-                mid = (l + r) / 2;
             }
-
-                return null;
+            return null;
         }
     }
 

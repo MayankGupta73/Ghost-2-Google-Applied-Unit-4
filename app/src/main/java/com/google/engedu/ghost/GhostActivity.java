@@ -19,6 +19,7 @@ import android.content.res.AssetManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -44,6 +45,8 @@ public class GhostActivity extends AppCompatActivity {
     TextView text,label,tvUserScore,tvCompScore;
     SimpleDictionary simpleDictionary;
 
+    public static final String TAG = "ghost";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,17 +60,19 @@ public class GhostActivity extends AppCompatActivity {
         AssetManager assetManager = getAssets();
         try {
              simpleDictionary = new SimpleDictionary(assetManager.open("words.txt"));
+            onStart(null);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
         btnChallenge.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(userTurn == false)
+                if(!userTurn)
                     return;
                 String word = text.getText().toString().trim();
                 if(word.length()>=4 && simpleDictionary.isWord(word)){
-                    label.setText("User Wins");
+                    label.setText("User Wins. This is already a word.");
                     btnChallenge.setEnabled(false);
                     userScore++;
                     updateScore();
@@ -75,7 +80,7 @@ public class GhostActivity extends AppCompatActivity {
                 else {
                     String correctWord = simpleDictionary.getAnyWordStartingWith(word);
                     if(correctWord == null){
-                        label.setText("User Wins");
+                        label.setText("User Wins. No word can be made.");
                         btnChallenge.setEnabled(false);
                         userScore++;
                         updateScore();
@@ -95,13 +100,21 @@ public class GhostActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 btnChallenge.setEnabled(true);
-                userTurn = false;
+                btnReset.setEnabled(true);
                 text.setText("");
-                onStart(null);
+                userTurn = random.nextBoolean();
+                text.setText("");
+                text.setFocusable(true);
+                if (userTurn) {
+                    label.setText(USER_TURN);
+                    userTurn = true;
+                } else {
+                    label.setText(COMPUTER_TURN);
+                    computerTurn();
+                }
             }
         });
 
-        onStart(null);
     }
 
     @Override
@@ -150,31 +163,39 @@ public class GhostActivity extends AppCompatActivity {
     private void computerTurn() {
         String word = text.getText().toString().trim();
         btnChallenge.setEnabled(false);
+        btnReset.setEnabled(false);
         userTurn = false;
         if(simpleDictionary.isWord(word) && (word.length()>=4)){
             label.setText("Computer Wins. This is a word already");
             compScore++;
             updateScore();
+            btnReset.setEnabled(true);
             return;
         }
         else{
-            String correctWord = simpleDictionary.getAnyWordStartingWith(word);
+            String correctWord;
+            correctWord = simpleDictionary.getAnyWordStartingWith(word);
+            Log.d(TAG, "computerTurn: word "+word);
+            Log.d(TAG, "computerTurn: correctWord "+correctWord);
             if(correctWord == null){
                 label.setText("Computer Wins. No word can be formed!");
                 btnChallenge.setEnabled(false);
                 compScore++;
                 updateScore();
+                btnReset.setEnabled(true);
                 return;
             }
             else {
                 char n = correctWord.charAt(word.length());
-                text.setText(word + n);
+                String newWord = word + n;
+                text.setText(newWord);
             }
         }
 
         userTurn = true;
         label.setText(USER_TURN);
         btnChallenge.setEnabled(true);
+        btnReset.setEnabled(true);
     }
 
     /**
